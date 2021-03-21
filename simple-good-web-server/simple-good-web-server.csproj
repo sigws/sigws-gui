@@ -5,6 +5,7 @@
     <TargetFramework>net5.0-windows</TargetFramework>
     <RootNamespace>simple_good_web_server</RootNamespace>
     <UseWindowsForms>true</UseWindowsForms>
+    <SignAssembly>false</SignAssembly>
   </PropertyGroup>
 
 </Project>

@@ -2,6 +2,8 @@
 using System.Windows.Forms;
 using System.Runtime.InteropServices;
 using System.Threading;
+using System.Net.NetworkInformation;
+using System.Net;
 
 namespace simple_good_web_server
 {
@@ -31,10 +33,35 @@ namespace simple_good_web_server
 			}
 		}
 
+		public static bool PortInUse(int port)
+        {
+            bool inUse = false;
+ 
+            IPGlobalProperties ipProperties = IPGlobalProperties.GetIPGlobalProperties();
+            IPEndPoint[] ipEndPoints = ipProperties.GetActiveTcpListeners();//IP端口
+ 
+            foreach (IPEndPoint endPoint in ipEndPoints)
+            {
+                if (endPoint.Port == port)
+                {
+                    inUse = true;
+                    return inUse;
+                }
+            }
+            ipEndPoints = ipProperties.GetActiveUdpListeners();//UDP端口
+            foreach (IPEndPoint endPoint in ipEndPoints)
+            {
+                if (endPoint.Port == port)
+                {
+                    inUse = true;
+                    return inUse;
+                }
+            }
+            return inUse;
+        }
+
 		private void button1_Click(object sender, EventArgs e)
 		{
-			button1.Text = "已开启";
-			button1.Enabled = false;
 			string text = textBox1.Text;
 			int.TryParse(text, out pORT);
 			[DllImport("sig-kernel.dll", EntryPoint = "StartListenAndServe")] static extern void StartListenAndServer(int port_number_in);
@@ -43,6 +70,9 @@ namespace simple_good_web_server
 				StartListenAndServer(port_number);
 			}
 			Thread thread = new(RunKernel);
+			thread.Start(pORT);
+			button1.Enabled = false;
+			button1.Text = "已开启";
 			//if (button1.Text=="开始") {
 			//	button1.Text = "暂停";
 			//	thread.Start(pORT);
@@ -51,7 +81,6 @@ namespace simple_good_web_server
 			//	button1.Text = "开始";
 			//	CallPause();
 			//}
-			thread.Start(pORT);
 		}
 
 		private void button2_Click(object sender, EventArgs e)
